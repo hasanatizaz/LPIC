@@ -1,0 +1,200 @@
+When Machine Starts, boot loader loads,
+
+We have different bootloaders, some are of them are grub and grub2
+
+grub is the old boot loader, configured through /boot/grub/grub.conf, Changes are read directly while booting.
+
+Grub 2 is the new bootloader, When configuration are done in /etc/default/grub, Then Modifications are written to /boot/grub2/grub.cfg by using
+
+grub2-mkimage > /boot/grub /grub.cfg
+
+NOTE: Never edit /boot/grub2/grub.cfg file directly. 
+
+LILO(linux loader) is the very old bootloader, Changes are written to disk by using lilo command. 
+
+==============================
+Default Location of Bootloader
+============================== 
+
+1)Begining of your hard drive first 446 bytes of your hard-drive (MBR)
+OR
+2)Boot sector of the active partition (used in multi boot systems like windows+linux+etc) This can be verified from /dev/sda1 marked as boot partition, however its not used anymore, people don't use multi boot systems anymore.
+
+To view the first 512 bytes --> MBR
+--------------------  
+xxd -l 512 /dev/sda   --> xxd is the hexadecimal viewer
+-------------------- 
+
+=====================
+Installation of grub2
+=====================
+
+grub2-install /dev/sda
+
+grub2-mkconfig
+
+
+=============
+Boot Sequence 
+=============  
+                               MBR (Master Boot Recorder) --> Parition Table                      
+                               /                                              \
+                              /                                                \
+                             /                                                  \
+POST (POWER ON SELF TEST)                                                    Bootloader
+                             \                                                  /
+                              \                                                /
+                               \                                              /
+                               EFI (extended Firmware Interface) --> GTP
+
+
+Once the Boot loader has control We  can select lilo,grub or grub2.
+
+Bootloader --> Lilo/grub2/grub
+
+                    |
+                    |
+                    V
+
+                  Kernel
+                    +
+                Initramfs
+                    |
+                    |
+                    V
+           Init/upstart/systemd      
+                    |
+                    |
+                    V
+                Services
+             (login shell)           
+
+
+
+Kernel is the heart of an operating system where as initramfs comes with it tell what needs to be loaded(initial file system & drivers)
+
+Init is the classical process, used to starts process sequentially.
+upstart and system systemd are event based
+
+===================================
+Understanding SysVinit and systemd
+===================================
+============
+SystemVinit
+============
+
+SystemVinit is not obsolete and is not valid on modern systems,
+/etc/inittab to set runlevels, 
+/etc/rc* ---> scripts that executes depending upon which runlevel is used.
+
+command that can set scripts execution in SystemVinit
+service 
+chkconfig
+
+
+========
+Systemd
+========                
+This is now the modoern implementation against systemvinit, its considered as more robust and faster, its event driven, 
+
+
+Files that are present in /var/lib/systemd are known as unit files. There are different type of unit files such as service,mount target etc unit files.
+
+In systemd there is a important concept of target, target can be described as collection of services.
+For every service file there is a target, which is mandatory to set. e.g ---> WantedBy=multi.user.target
+
+commonly used targets are [ multi.user.target ]  and [ graphical.target ]
+
+To display different type of targets [ known as runlevel targets ]
+-----------------------------
+ls /usr/lib/systemd/system/runlevel*
+-----------------------------
+
+Man Page
+----------------
+man systemd.unit
+----------------
+
+
+SystemD is  event driven, services are started only when they are needed. Instead of waiting for all scripts to execute and then start paritulcar process(systemvinit)
+
+Service scripts that are unit files in systemd are easier to read and understand that services scripts(systemvinit)
+
+To change the default target of the system
+--------------------------------------
+systemctl set-default graphical.target  
+--------------------------------------
+
+AND 
+---------------------------------------
+systemctl set-default multi-user.target  
+---------------------------------------
+
+=====================
+Runlevels in Systemd
+=====================
+
+To change runlevel in systemd
+
+graphical mode
+-------------------------------
+systemctl isolate rescue.target
+-------------------------------
+
+non graphical mode
+-------------------------------
+systectl isolate multi-user.target
+-------------------------------
+
+============================
+To change parameters in grub (at the end of kernel parameter)
+============================
+systemd.unit=rescue.target  
+
+
+
+NOTE: In systemd init or telinit commands will work to change runlevels.
+
+
+=====================
+Awareness of Upstart
+=====================
+
+Upstart was the initiative of ubuntu but could not takeoff, It is backward compatible, Though the service scripts were the same and the concept 
+of runlevel was there besides it was event based(similar like systemd)
+
+
+
+
+
+
+================================
+Checking Boot Events in the log
+================================
+
+To check the current boot logs (detailed logs)
+--------------
+journalctl -b
+--------------
+ -b --> boot logs
+
+Journald exists on systemd only.
+
+Dmesg
+dmesg still exists however the disadvantage of dmesg is that it does not log all the logs from the inititation of the boot process.
+
+------------------
+dmesg | grep e1000
+------------------
+
+
+
+
+
+
+
+
+
+
+
+                      

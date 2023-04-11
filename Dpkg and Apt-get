@@ -1,0 +1,99 @@
+Dpkg -- > Debian Package.
+
+to see installed packages
+----------------------
+dpkg --get-selections
+----------------------
+
+to see the list of files in a package.
+--------------------
+dpkg -L packagename
+--------------------
+
+to find out package name from a file
+-----------------------
+dpkg -S /usr/bin/eject
+-----------------------
+
+to have information about the package
+--------------------
+dpkg -p packagename
+--------------------
+
+to install debian file.
+--------------------
+dpkg -i packagename
+--------------------
+
+to reconfigure packages.
+-------------------
+dpkg --configure 
+-------------------
+
+To remove a package.
+-------------------
+dpkg -r packagename
+-------------------
+
+to purge the configuration files as well
+-------------------
+dpkg -P packagename
+-------------------
+
+print information for installed packages.
+--------
+dpkg -p
+--------
+
+to have information of uninstalled package
+------------------------
+dpkg -l packagefile.deb 
+------------------------
+
+We have a text based utility for managing packages as well knonwn as  dselect
+--------
+dselect
+--------
+
+===========================================
+
+
+Defining other repositorories for packages.
+-------------------------
+vim /etc/apt/sources.list
+-------------------------
+
+building new cache for packages
+--------------
+apt-get check
+--------------
+
+to query the udapted database of packages available in the repo
+--------------------------
+apt-cache show packagename
+--------------------------
+
+to get information of all packages having ldap in their name
+----------------------
+apt-cache search ldap
+----------------------
+
+
+To show the dependency of a package
+-----------------------
+apt-cache showpkg samba
+-----------------------
+
+Check database for broken installations
+-------------
+apt-get check
+-------------
+
+To clean the package cache
+-------------
+apt-get clean
+
+========================================================================
+To install RPM on  a debian based system, we use alien software package.
+========================================================================
+

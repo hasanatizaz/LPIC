@@ -1,0 +1,6 @@
+MBR Limitation : 2 TB, 15 Partitions, Primary, Extended.
+GPT Need Unified Extensible firmware interface  (UEFI) - 128 Partitions
+GPT stores backup partition table at the end of disk.
+GUID is used  as an identifier 
+gdisk is the GPT disk management tool.
+For UEFI boot - /boot/efi

@@ -1,0 +1,134 @@
+What is a user
+
+User is an entity that is needed to provide with certain resources.
+
+/etc/login.defs ----> login defination 
+
+/etc/default/useradd ---> extends login defination, however if any conflict occurs then /etc/login.defs overwrites /etc//default/useradd
+
+cat /etc/passwd ---> users are defined.
+
+to add user 
+-------------
+useradd hasan
+-------------
+
+to modify user
+----------
+usermod 
+----------
+
+======
+Groups
+======
+
+----------------
+groupadd --help
+----------------
+
+to add group
+----------------
+groupadd testing
+----------------
+
+
+if a user wishes to gain access to any group, this is going to prompt for a password set the password for group  testing first using `gpasswd testing`
+---------------
+newgrp testing
+---------------
+  then enter password
+
+
+To list down members in a group testing, it will not display those members who has its primary group
+------------------------
+groupmem -g testing -l
+------------------------
+
+
+To Change user password
+-------
+passwd
+-------
+
+OR
+
+-------
+chage    --> change age
+-------
+
+
+====================
+Structure of Files
+====================
+
+============
+/etc/passwd
+============
+
+hasan:x:1000:1000:hasan:/home/hasan:/bin/bash
+
+first column  ---> username
+second column ---> passwd containing field, in older distributions, password used to save here, but not anymore. its now saved in /etc/shadow
+third column ---> uid
+fourth column ---> gid
+fifth column --->  comments
+sixth column ---> home directory
+seventh column ---> shell type
+
+============
+/etc/shadow
+============
+
+hasan:$6$tzzNJYS5HC5xKlmq$tgoKH.cBb0exVodZaJdwQYWt2b0LxgPXSgApi5YSVQIdgBsfH6q4d4BI43ZiysdM.YL3mDshKlsAVc02x7vXQ.:17642:0:99999:7:::
+
+first column  ---> username
+second column ---> encrypted password if there are !! it means user cannot login as no password  is not. if empty then user can login without password
+third column ---> amount of days the account is created. JAN 1st 1970, set this to zero if you want user to change passwd after login
+fourth column ---> minimum amount of time the password has to be used. if zero, it means user can change it anytime
+fifth column --->  max amount of days the password has to be used
+sixth column ---> days before user is probed to change password before it gets expired in this case its 7 days before expiry.
+seventh column ---> 
+
+
+===========
+/etc/group
+===========
+
+hasan:x:1000:
+
+first column  ---> group name
+second column ---> passwd containing field, in older distributions, password used to save here, but not anymore. its now saved in /etc/gshadow
+third column ---> gid
+fourth column ---> members in the group
+
+
+============
+/etc/gshadow
+============
+
+hasan:!::
+
+first column  ---> group name
+second column ---> passwd containing field, if ! no password set
+third column ---> gid
+fourth column ---> members in the group
+
+
+Incase if a file such as /etc/passwd /etc/group /etc/shadow and /etc/gshadow are modified at a same time another user invokes changes using command for modifiation in the file a dead lock can occur, to avoid such dead lock we use
+
+------------
+vipw --help
+------------
+
+and 
+
+------------
+vigr --help
+------------
+
+
+
+
+
+
+

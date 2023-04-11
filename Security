@@ -1,0 +1,218 @@
+Auditing a System to Find Files with SUID SGID
+
+SUID
+file that is run owner's permission.
+permission 4000 - ignore 000
+
+SGID
+file that is run by group's permission.
+permission 2000 - ignore 000 
+
+======================================
+Analyzing Ports with netstat and nmap
+======================================
+
+All ports are listend under 
+-------------
+/etc/services ---> contains all ports
+-------------
+
+netstat is used to run on local machines where as nmap is used to run on remote machines.
+
+to show all ports on machine
+-----------
+netstat -a
+-----------
+
+A better approach to have a look is 
+----------------
+netstat -tulpen
+----------------
+  - t ---> tcp/ip
+  - u ---> udp
+  - l ---> listening 
+  - p ---> pid
+  - e ---> extended information 
+  - n ---> shows numerical address
+
+=====
+nmap 
+=====
+
+By default nmap is considered to be a hostile by some network administrators and special permissions are needed to run this tool over a network.
+
+To scan machine
+-----------------
+nmap 192.168.1.1
+-----------------
+
+To scan a network
+-------------------
+nmap 192.168.1.0/24
+-------------------
+
+To scan machine with -A option to enable OS and version detection
+-------------------
+nmap -A 192.168.1.1
+-------------------
+
+To ping hosts and check if its up.
+-----------------------
+nmap -sP 192.168.1.0/24
+-----------------------
+  -s ---> scan 
+  -P ---> Ping sweep 
+
+
+
+To check if a port 80 is opened
+-----------------------
+nmap -p 80 192.168.1.2
+-----------------------
+  -p ---> port 
+
+
+To check if a port 80 is opened
+-----------------------
+nmap -p 80 192.168.1.2
+-----------------------
+  -p ---> port 
+
+
+To check if a port 80 is opened
+-----------------------
+nmap -p 80 192.168.1.2
+-----------------------
+  -p ---> port 
+
+
+=============================================================
+Setting Up Limits on User Logins, Processes, and Memory Usage
+=============================================================
+
+There are two ways to limit, 
+1) ulimit   --> only works with bash shell
+2) pam limits --> is more like universal, works with more of the shells.
+3) cgroups --> advance technique 
+
+man ulimit --> search for ulimit inside the man
+man pam_limits 
+
+
+Configuration File for pam_limits
+--------------------------
+/etc/security/limits.conf
+--------------------------
+
+to see where pam_limits is integrated ( in which pam modules )
+-------------------------------------
+cd /etc/pam.d ; grep pam_limits * -l
+-------------------------------------
+
+=================
+Configuring sudo
+=================
+
+Two types of users, 
+1) privileged (root)
+2) unprivileged
+
+If users who want to run process of privileged user then we use sudo,
+
+configuration file 
+------------
+/etc/sudoers
+------------
+
+To edit the above file we use visdo
+
+-------
+visudo
+-------
+
+===================================================================
+Determining Which Users Have Logged in and are Currently Logged in
+===================================================================
+
+pts ---> pseudo terminal  ( like terminal )
+tty ---> teletype
+  
+users --> print the user names of users currently logged in to the current host
+w --> Show who is logged on and what they are doing
+who --> show who is logged on, also shows from which ip user is comming from
+lastlog ---> fetch information from /var/log/lastlog
+last ---> fetch information from /var/log/wtmp -- historical information of lastlog (more more detailed)  
+
+
+=========================
+Setting Up Host Security
+=========================
+
+Implementation of TCP wrappers are now very old and usually not used anymore.
+
+-------------
+TCP Wrappers
+-------------
+
+/etc/hosts.allow  --> to allow a hosts
+/etc/hosts.deny   --> to deny a hosts
+
+
+
+NOTE : Today we use firewall using netfilter functionality in the linux kernel, Its the kernel who is filtering
+
+
+--------
+nologin
+-------
+If you want the user to be prevented from login set his shell to /sbin/nologin in /etc/passwd file.
+
+
+
+===============
+xinetd / inetd
+===============
+
+inetd is old and xinetd more recent implementation.
+
+In linux, the extended Internet services daemon (xinetd) replaced inetd. It performs the same function as inetd in that it listens to multiple ports and invokes a requested service. However, it is more secure. Typical xinetd services include Remote Shell (RSH), FTP, telnet, and Post Office Protocol 3 (POP3).
+Like the inetd daemon, xinetd needs to load and initialize a new process before it can handle a new request. If a network handles a large volume of e-mail, for example, the xinetd daemon would need to invoke the mail service for each mail request individually, resulting in an extremely slow response time. So it’s preferable to run the network’s mail service as a standalone daemon.
+
+It’s also common to run the HTTP, sendmail, ident, and Samba services as standalone daemons.  Services that xinetd manages are not encrypted. However, each service has its own level of authentication, which limits their use to trusted users and helps prevent denial-of-service (DoS) attacks.
+
+
+/etc/xinetd.d and /etc/xinetd.conf
+
+/etc/inetd.conf and /etc/inetd.conf
+
+
+============================================================    
+Understanding Advanced Security Such as SELinux and Apparmor
+============================================================    
+
+To implement a complete security framework we have different options such as selinux,apparmor, etc
+
+SELinux is developed by NSA, REDHAT and FEDORA guys
+
+In Selinux we need to create profiles where we define what application is allowed to do and what it is not allowed to do.
+
+To view selinux content labels,  ls -Z
+
+OUTPUT:
+
+[root@machine www]# pwd
+/var/www
+[root@machine www]# ls -Z
+system_u:object_r:httpd_sys_script_exec_t:s0 cgi-bin
+    system_u:object_r:httpd_sys_content_t:s0 
+
+
+This means that httpd Document Root /var/www is marked is labeled as  httpd_sys_content_t by selinux 
+
+
+Apparmor
+
+/etc/apparmor.d
+
+
+This is what you need to know for LPI

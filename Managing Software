@@ -1,0 +1,15 @@
+
+
+ Meta Package Handle
+
+
+
+RPM - 
+    ------> dependency ( means to install specific software, you need  other software as well and that is because many problems are using libraries.
+
+
+Solution to dependency is ---> Meta Handler --> a web server or a repository where installer looks for  dependeny.
+
+on Redhat --> Meta package handler is yum.
+On Debian --> Meta package handler is apt
+on Suse --> Meta package handler is zypper

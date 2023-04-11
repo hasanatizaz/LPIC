@@ -1,0 +1,187 @@
+==============================================
+ Application Produces Postscript print output
+==============================================
+
+Postscript has become the defacto standard for printing on many platforms. 
+Many printers support postscript however low end printers does not support postscript  
+Ghostscript is used for those printers who does not understand postscript.
+
+Ghostcript converts that to a print job for specific printer
+printer driver  and ghostscript are tightly integrated.
+
+Print job goes to a print queue. the queue is managed by a process. Multiple queues with different settings can be used for a same printer.
+for example in one queue there are black prints where as in other queue we have colored prints.
+Queue is typically a directory /var/spool/cups, cups(common unix printing system) is the default print queue manager, cups is invented by APPLE.
+
+/var/spool/cups ---> Cups Queue
+
+Support for specific printers through PPD(PostScript Printer Description) files, its like a driver, it allows print job to be formatted in a way that is understood by the printer.
+
+Ghostscript translates the print job in PostScript to an image that is compatible with a specific printer.
+The printer driver is a integrated part of GhostScript.
+The result of the ghost script is an image thaat it sends to a printer which is quite filter.
+Ghost Script uses smart filters to interpret the print job and send it to the queue, these smart filters also also capable of interpreting other input formats such as raw or text
+
+==================================================================
+ Creating a Basic CUPS(common unix printing system) Configuration 
+==================================================================
+
+cups configuration files are some what similar to apache configuration
+
+cups is normally started as a daemon
+
+configuration files are in /etc/cups  but setup in general is done through graphical tools.
+
+/etc/cups/printers.conf ---> contains printer defination 
+
+/etc/cups/cupsd.conf --->  contains generic settings for CUPS, including printer access setttings
+
+/var/log/cups/ ---> contains log files
+
+WebPage : http://localhost:631 is available for easy setup
+
+Most of the times  plug and play, it will appear all appear all by itself and minimal additional configuration is required.
+
+use CUPS web interface at http://localhost:631/admin 
+
+OR use
+-----------------------------------------------
+ladmin -p printer -E  -v device -m name-of-ppd 
+-----------------------------------------------
+ -p name of the printer [ e.g  testprinter ]
+ -E encrypted connection to the printer
+ -v device type  for information use [ lpinfo -v for view an overview of connection types ]
+ -m used to refer to the ppd file you want to uses
+  
+/usr/share/ppd/ ---> ppd files
+
+PPD files are usually in the cups filter directory. It is in the cups filter directory because they contain all the logic that is needed to filter the inputs that is recieved by the application and translate into an output. ppd file is the important part of the management of the printer. At times we need  to add ppd files manually to work with the printer, they are like the drivers.
+
+
+=================================
+Configuring a Text-only Printer
+=================================
+
+NOTE: Before setting up the printer, please make sure that cups is running.
+
+to find ppd files in the system
+-----------------------
+find / -iname "*.ppd*"
+-----------------------
+
+copy the ppd file into the cups model directory
+----------------------------------------------------------------
+cp /usr/share/ppd/cupsfilter/textonly.ppd /usr/share/cups/model/
+----------------------------------------------------------------
+
+To create the printer
+---------------------------------------
+lpadmin -p textprinter  -m textonly.ppd
+---------------------------------------
+
+To check printer defination
+--------------------------- 
+cat /etc/cups/printers.conf
+---------------------------
+
+To make textprinter as a default printer
+----------------------
+lpadmin -d textprinter
+----------------------
+
+Send jobs to the printer
+----------------------------
+lpr -Ptextprinter /etc/hosts
+
+  -Ptextprinter is not mandatory as we have set textprinter as default.   
+----------------------------
+
+==================== 
+Print Job Processing
+====================
+
+Please make sure to enable the printer before using it.
+
+to enable printer
+-----------------------
+cupsenable printername
+-----------------------
+
+If Printers are not accepting jobs then
+------------------
+accept printername
+------------------
+
+========================================================================================
+                                            Example
+
+
+-------------------
+lpq -Pcolorprinter
+-------------------
+OUTPUT: colorprinter is not ready
+
+------------------------
+cupsenable colorprinter
+lpq -Pcolorprinter
+-------------------------
+OUTPUT: colorprinter is ready
+
+---------------
+lpr /etc/hosts
+---------------
+
+OUTPUT: lpr: Destination "colorprinter" is not accepting jobs.
+
+-------------------
+accept colorprinter
+-------------------
+then it wil going  to accept jobs as well
+
+==========================================================================================
+
+After sending a print job to a printer, it gets in a queue before handled by the printer.(CUPS does this)
+If process gets stuck in the queue, we can use `lpq -Pprintername`
+
+to check the queue
+------------------
+lpq -Pprintername
+------------------
+
+===========================
+Managing User Print Queues
+==========================
+
+If there are jobs or if you want to remove any job from the queue we can do as follows
+
+lpq --> to get print job information
+lprm --> remove the last job number
+lprm job number --> remove that job only
+
+lprm - --> to remove all print jobs ( only root can do it )
+
+
+
+==================
+Troubleshooting
+==================
+
+Whenever a message is sent to the printer, it first lends into the queue, cups pick the information from the queue and pushes that information to the printer, modern printers have a big memories/buffers, incase if you need to cancel a job, thats already being pushed and picked from cups to the printer, you might need to poweroff the printer in that case, otherwise if its an old printer usually the buffer sizes are small so not many information could be sent, hence the job immediately kills.
+
+
+If you want that all the jobs should be in queue and not to be sent to cups.
+------------------------
+cupsdisable printername
+------------------------
+
+A queue will be maintained, inorder to process that queue after filtering incase of killing any job if needed be, we can enable cups again.
+
+to enable queue to be processed back
+----------------------
+cupsenable printername
+----------------------
+
+
+
+ 
+

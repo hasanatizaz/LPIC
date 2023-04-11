@@ -1,0 +1,17 @@
+paste 
+ join
+nl
+split
+cpio
+dd --> convert copy. 
+
+tar tvt abc.tar --> shows the content in tar.
+
+tar xvf abc.tar home/lisa --> will restore home/lisa file from abc.tar to the current location.
+
+tar xvf abc.tar -C /hasan ==> restore abc.tar in /hasan/
+
+fg bg 
+run process ctrl z then type bg. send it to bg, to bring it to fb type fg
+
+ps fax

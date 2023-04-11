@@ -1,0 +1,59 @@
+find the command from the available packages in the repo for specific file.
+dnf whatprovides */sealerts
+
+show dependency packages required for installation of selinux.
+dnf deplist selinux
+
+install local rpm with dnf localinstall incase if dependency requierd dnf will bring in those dependencies.
+dnf localinstall packagename
+
+to show information of the package.
+dnf info packagename    
+
+to install a rpm package.
+rpm -ivh
+
+to upgrade a rpm package.
+rpm -Uvh
+
+Freshen Package.
+rpm -F 
+
+To see list of installed rpms in the system.
+rpm -qa
+
+show rpm files do not extract.
+rpm2cpio zulucrypt-debugsource-5.4.0-4.fc29.x86_64.rpm  | cpio -idm
+
+
+to find a file from which package it belonged to
+rpm -qf /usr/sbin/ipmaddr
+  -q query
+  -f file
+
+to find information of the package.
+rpm -qi net-tools
+
+to see the list of files in the package.
+rpm -ql package-name
+
+to see the documentation of this package
+rpm -qd packagename
+  -q query
+  -d documentation
+
+to see the configuration file of this package.
+rpm -qc package-name 
+  -q query
+  -c configurationfile
+
+To verifiy All packages  on the system.
+rpm -Va
+  -V verify
+  -a all
+
+
+
+
+
+ 

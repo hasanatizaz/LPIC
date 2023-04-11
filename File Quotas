@@ -1,0 +1,6 @@
+Quotas a actually the limits that are assigned to users. 
+
+
+To install package 
+
+apt-get install quotas

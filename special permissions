@@ -1,0 +1,22 @@
+chmod 4777 file.sh
+u+s
+set uid.
+
+g+s
+set group id 
+ 
+files created under the shared environment, user owner will be maintained.
+
+
+chmod +t sales 
+chmod 1777 sales
+u+t
+sticky bit. 
+
+Sticky bit applies on the folder, who ever creates a file, only he can delete  that file.
+
+
+
+chmod 4770 sales ---> 
+
+chmod 3770 sales --> set group id

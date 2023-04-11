@@ -1,0 +1,83 @@
+Creating and Managing at Jobs
+
+There are two wawys setup jobs,
+
+1)at
+2)cron
+
+
+===
+At
+===
+Jobs that are required to be run once
+
+DAEMON : atd
+
+
+
+To setup job at 4pm
+-------------
+at teatime 
+logger hello
+-------------
+ctrd+d to end
+
+To list queues 
+----
+atq
+----
+
+To remove jobs
+----------
+atrm job#
+----------
+
+/etc/at.deny ---> contains the list of users that are not allowed to use at.
+/etc/at.allow ---> contains only the users that are allowed to use at.
+
+If /etc/at.deny is empty no one is blocked
+
+If /etc/at.allow exists, only users mentioned in it may schedule at jobs
+
+If neither of them are present then only ROOT can schedule jobs
+
+
+NOTE To explore more about at use `man at`
+
+
+=====
+Cron
+=====
+jobs that are required to run more than once or multiple times
+
+Daemon : crond
+
+configuration file : /etc/crontab
+                     /etc/cron.d
+                     /etc/cron.daily
+                     /etc/cron.deny
+                     /etc/cron.hourly
+                     /etc/cron.monthly
+                     /etc/cron.weekly
+
+
+
+Listing of cronjobs for the current user
+----------
+crontab -l
+----------
+
+to edit the cron for current user
+----------
+crontab -e
+----------
+
+/etc/cron.deny ---> contains the list of users that are not allowed to use at.
+/etc/cron.allow ---> contains only the users that are allowed to use at.
+
+If /etc/cron.deny is empty no one is blocked
+
+If /etc/cron.allow exists, only users mentioned in it may schedule at jobs
+
+If neither of them are present then only ROOT can set cron job
+

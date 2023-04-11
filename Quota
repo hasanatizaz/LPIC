@@ -1,0 +1,42 @@
+Quota -- Limit access to files user can create.
+
+
+yum install quota
+
+vim /etc/fstab 
+
+add defaults,usrquota,grpquota 1 2
+
+mount/remount the partition.
+
+
+mount /dev/sda3 /datavol
+
+quotacheck -mavug
+   -m  --> mounted file systems
+   -a  --> all file systems in exists in /etc/fstab
+   -v  --> verbose
+   -u  -->  user quota
+   -g  -->  group quota
+
+Two Files would be created user.quota and group.quota, this ensures that quota is in place.
+
+to enable quota service
+quotaon -a 
+
+To checks quota limit of user hasan.
+quota -vu hasan
+
+To edit quota
+edquota -u hasan 
+
+change the soft and hard limits in blocks ( total file size)
+
+1000 1000 meaning soft limit and hard limit  is 1MB
+
+you can edit the inode section for the putting a limit on number of files.
+
+Quota Report
+repquota -aug
+
+

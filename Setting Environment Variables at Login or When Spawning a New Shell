@@ -1,0 +1,90 @@
+=====================
+Environment Variables
+=====================
+
+ is a label that you give to a certain value.
+
+To check environment variables
+---
+env
+---
+
+
+defining a variable.
+----------
+COLOR=red
+
+----------
+
+to check the variable
+----------
+echo $COLOR
+
+----------
+to made it avaible to available to other subshells
+-----------------
+export COLOR=blue
+-----------------
+
+
+/etc/profile --> generic file used by all users. 
+/etc/bashrc --> is for a subshell
+
+Incase of modifications for fewer users then
+/home/hasan/.bashrc -->  needs to put stuff whenever user want anything to be made available when user starts a new shell, such as opening a open terminal or subshell.
+/home/hasan/.bash_profile ---> used if you want to anything to be made available when users logged in.
+
+
+To unset variables.
+------------
+unset COLOR
+-----------
+or 
+---------
+-------
+COLOR=
+-------
+
+to check the variable
+-----------
+echo $COLOR
+
+
+PAM 
+
+Pluggable authentication modules.
+
+ allows you to insert modules in specific cases.
+
+
+----------
+
+==============
+Bash Function
+==============
+command `set` as alot of functions in it.
+
+Function is a like a small program that can be used elsewhere as well.
+
+====================================================
+Maintaining Skeleton Directories for New Users
+====================================================
+
+If you want some file to be created automatically in the new user use /etc/skel
+
+/etc/skel
+
+================================
+Setting the Command Search Path
+================================
+ Commands that available by pressing tab tab we get the information from PATH variable.
+-----------
+echo $PATH
+-----------
+
+to add /something in the path variable.
+-----------------------------
+export PATH=$PATH:/something
+-----------------------------
+
+

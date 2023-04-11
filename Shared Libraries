@@ -1,0 +1,40 @@
+=======
+Library
+=======
+A library provides functions to the programs, because of libraries programmers does not need to reinvent the wheel to write the programs.
+
+Two type of libraries 
+1)Static
+Compiled into the library, always loaded at the moment the binary is started
+
+2)Dynamic
+It only loads when required or asked to load.
+
+
+for graphical interface commmon libraries are gtk+ (GNOME) and qt (KDE) toolkits are very frequently used
+
+
+to see what library is required for /bin/passwd command
+----------------
+ldd /bin/passwd
+---------------- 
+
+Libraries are typically spread in different locations, Inorder to find those libraries, we need to create a temp cache where all the dumps of these libraries are stored.
+
+to create cache of libraries that exist in the system
+--------
+ldconfig
+--------
+
+Once the command is completed, go to /etc/ld.so.cache
+
+To open that cache, since its in a binary format we will open it by using strings command so only the asci is read.
+-------------------------
+strings /etc/ld.so.cache
+-------------------------
+
+NOTE: At times when program reports of missing libraries or  issues related to libraries, we should execute `ldconfig` because those information are stored in /etc/ld.so.cache and is read from there, by executing `ldconfig` we update the database and at times it fixes those library issue if it exists and not present in ld.so.cache as the library information is taken from there.
+
+
+
+

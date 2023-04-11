@@ -1,0 +1,137 @@
+KERNEL ( responsible for loading devices)
+
+UDEV  ----> RULES 
+ |
+ |
+ V
+/sys (SysFS)
+
+UDEV is a helper to kernel to identify devices and help them load, Udev rules decides how those devices are created. Inorder to write correct
+Information about the devices to the right location, there is sysfs(how devices are initialized)
+
+=============================================
+Enable and Disabling Integrating Peripherals
+=============================================
+
+Ther is a process named udev, that helps to activate and deactivate peripherals, 
+
+For example going into /proc/scs - It should display all the scsi devices available to the system, Along with proc filesystem
+there is a /sys file system, Its like a  hardware  interface to the kernel, and provides a very detailed information about everything which is 
+installed.
+
+/sys/block/ --> display sysmlinks and points to the exact location of the device.
+
+There is a ls utility like 
+lsblk --> display block devices.
+lscpu --> display information for cpu
+lsusb & usb-devices --> display information related to usb devices.
+lsbpci --> display information for pci devices
+
+
+
+
+Installtion with or without external peripherals,
+For exampmle blade servers, we use unattended installation, picking information stuff from PXE boot, once the installation is  done, ssh or through vnc
+we can take the access of the server, Another way is using a management port.
+
+=================================================================
+Differentiating Between the Various Types of Mass Storage Devices
+=================================================================
+
+Displaying different devices
+----------------    ------
+/proc/paritions  && lsblk
+----------------    ------
+
+ -fd0 devices points to 1st floppy drive
+ -sda devices points to the 1st SCSI device
+   -sda1 refers to the first parition on the first SCSI device(sda)
+  -sdb devices points to the 2st SCSI device
+   -sdb1 refers to the first parition on the second SCSI device(sdb)
+   -sr0 device points to the first optical drive
+  -hda devices points to the 1st IDE device
+   -hda1 refers to the first parition on the first IDE device(sdb
+  -vd devices refer to kvm  virtual machines. 
+   -xvd devices refers xen virtual machines
+
+Typically SAN devices are shown as SCSI devices such as /dev/sda/b/c....
+
+Kernel see devices as MAJOR and Minor Device category, These devices are shown as files under /dev directory, 
+
+====================================================
+Differentiating Between Coldplug and Hotplug Devices
+====================================================
+
+Cold Plug devices are those devices that needs computer to be shutdown before installing them, one they are installed, power it ON, such as adding a CPU.
+
+Hot plug devices are those devices that can be swapped in or out while the computer is running, one of such example is USB drive, Operating system can read it when the device gets plugged in, This is done by the UDEV daemon in linux, 
+
+To monitor the activity of UDEV
+---------------
+udevadm monitor
+---------------
+
+One a hot device is plugged in, a device gets created in /dev by udev, to access these devices we need kernel modules. kernel modules work with in conjunction with UDEV to load kernel modules.
+
+If the device is coldplug, you might need to load the modules manually with the help of 'modprobe modulename'
+
+To load kernel module.
+-------------------
+modprobe module-name
+-------------------
+
+Module information
+-------------------
+modinfo modulename
+-------------------
+
+To remove kernel module
+--------------------
+modprobe -r modulename
+--------------------
+
+------------------------------------------
+Determining Hardware Resources for Devices
+------------------------------------------
+
+to see information for lspci with information such as memory address, capability, use verbose mode
+---------
+lspci -v
+---------
+
+---------
+lsusb -v 
+---------
+
+All this information is coming from /sys directory.
+
+====
+NOTE
+====
+
+In the beginning (way back in Unix), the way that programs found out about the running processes on the system was via directly reading process structures from the kernel memory (opening /dev/mem, and interpreting the raw data directly). This is how the very first 'ps' commands worked. Over time, some information was made available via system calls.
+
+However, it is bad form to expose system data directly to user-space via /dev/mem, and obnoxious to be constantly creating new system calls every time you wanted to export some new piece of process data, and so a newer method was created to access structured data for user-space applications to find out about process attributes. This was the /proc filesystem. With /proc, the interfaces and structures (directories and files) could be kept the same, even as the underlying data structures in the kernel changed. This was much less fragile than the earlier system, and it scaled better.
+
+The /proc filesystem was originally designed to publish process information and a few key system attributes, required by 'ps', 'top', 'free' and a few other system utilities. However, because it was easy to use (both from the kernel side and the user-space side), it became a dumping ground for a whole range of system information. Also, it started to gain read/write files, to be used to adjust settings and control the operation of the kernel or its various subsystems. However, the methodology of implementing control interfaces was ad-hoc, and /proc soon grew into a tangled mess.
+
+The sysfs (or /sys filesystem) was designed to add structure to this mess and provide a uniform way to expose system information and control points (settable system and driver attributes) to user-space from the kernel. Now, the driver framework in the kernel automatically creates directories under /sys when drivers are registered, based on the driver type and the values in their data structures. This means that drivers of a particular type will all have the same elements exposed via sysfs.
+
+Many of the legacy system information and control points are still accessible in /proc, but all new busses and drivers should expose their info and control points via sysfs.
+
+ -- TIM Bird
+
+
+====
+DBUS 
+====
+
+When talking to hardware, we should be aware of DBUS, DBUS for IPC and allows users to commmunicate with different pieces of hardware, It allows processes to work together and to connect them to hardware as well, system daemon takes calls from DBUS.
+
+dmesg ---> shows the kernel ring buffer
+
+/var/log/messages ---> shows information related to connected hardware.
+
+
+    
+
