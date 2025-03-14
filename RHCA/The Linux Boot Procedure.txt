@@ -1,0 +1,316 @@
+Boot Process
+Firmware ---> Disk ---> MBR ---> Grub --> kernel, initramfam ---> init = systemd ---> early boot ---> services ---> shell / gdm
+
+
+Firmware ---> Disk ---> GPT ---> Boot Partition ---> Grub ---> kernel, initramfam ---> init = systemd ---> early boot ---> services ---> shell / gdm
+
+
+
+GPT ---> GUID Partition Table  is getting grub from boot partition	
+
+MBR ---> 1981 standard is getting grub from bootsector
+
+grub is a bootloader	
+
+
+services    this is where we have fully functional system, but don't have services yet
+  rescue.target
+
+before early boot is starting 
+    system.unit = emergency.target   --> makes sure only the bare minimum is available
+
+by pass init = systemd
+    init = /bin/bash
+
+after loading of initramfs
+  				rd.break
+
+
+grub 
+  resucue disk
+
+
+
+
+bios is legacy of booting
+
+uefi able to boot with disk that are bigger than 2TB of disk with gpt table
+
+funny thing is VMs still use bios and does not require uefi.
+
+uefi can be configured with secure boot 
+
+secure boot can prevent the loading of an operating system that is not signed with digital signature. 
+secure boot is adding security to the bootsector also prevent loading of an operating system that is not signed with known digital signature.
+
+Managing UEFI booting
+
+
+booting from uefi is different as operating systems register themselves with uefi firmware
+ unlike bios there is no longer a need to scan for bootable devices.
+ the action comes from the os where the os register itself in the firmware as the next thing to boot.
+ an efi system partition is required to boot.
+
+efi system replaces the stage 1 booting on mbr systems, in mbr the first sector contains the boot information, on efi systems that is efi parition itself.
+
+
+on uefi system secure boot is normally enabled
+secure boot denies write to uefi firmware, secure boot is there to prevent virus
+  writes are only allowed if uefi approved keys are used
+
+
+On redhat systems grub2-install will write a bootable to the UEFI firmware with the name grub64.efi, this will causes system boot to fail, as the uefi firmware should contain the shim.efi file
+
+to reinstall grub2 on uefi systems, use dnf reinstall grub2-efi shim from a rescue system.
+
+shim file contains the keys that are required to for secure booting
+
+optionally also use grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg to restore the grub configuration file.
+
+shim.efi is the default UEFI boot target on RHEL.
+
+from shim.efi. the grubx64.efi bootloader is loaded.
+
+shim.efi is signed with the a key that is trusted by most UEFI firmware
+
+the efibootmgr tool allows user to manage the available UEFI boot targets.
+
+
+efibootmgr makes managing uefi boot targets possible.
+
+you cna use efibootmgr to list all current boot targets
+
+active boot entries are marked with *
+
+use efibootmgr -v for more details
+
+force the system to boot into another entry the next time it is started using the -n option
+  efibootmgr -n 2c
+
+ alternatively from the grub boot menu access the uefi firmware setting menu options
+
+ lsblk to check the /boot/efi partiton
+
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
+sda      8:0    0 465.8G  0 disk 
+├─sda1   8:1    0   953M  0 part /boot/efi
+├─sda2   8:2    0  18.6G  0 part /boot
+├─sda3   8:3    0 232.8G  0 part /
+├─sda4   8:4    0   3.7G  0 part /storage
+└─sda5   8:5    0 209.6G  0 part 
+zram0  252:0    0     8G  0 disk [SWAP]
+
+note: /boot/efi is the system partition. 
+
+to check the first 512 bytes
+ xxd -l 512 /dev/sda
+
+
+if its zeros then its empty
+
+because EFI firmware is taking care for EFI system
+it resides in 
+/boot/efi
+
+
+mount | grep vfat
+
+/dev/sda1 on /boot/efi type vfat (rw,relatime,fmask=0077,dmask=0077,codepage=437,iocharset=ascii,shortname=winnt,errors=remount-ro)
+
+the efi partition is vfat as its readable by all the main operating systems.
+
+efibootmgr is printing all the boot targets.
+
+changing boot target can be done as well by
+
+efibootmgr -n 0004
+
+look for BootNext should be changed to 0004
+BootCurrent: what is being  loaded right now.
+
+UEFI systems changes a little bit, boot partition and efibootmgr, efi options installed in grub boot menu on efi system.
+
+
+Bootloader
+
+Through the firmware, the bootloader is activated
+
+the purpose of the bootloader is to load linux kernel and the related initramfs
+
+also the boot menu can be presented to specify boot options.
+
+grub2 is the common bootloader on linux
+
+lilo and grub on legacy systems 
+
+uboot is used on embedded linux
+
+bootloader parameters after loading kernel can be
+
+mem=1024M systemd.unit=rescue.target
+
+to get back to complete system
+
+systemctl isolate graphical.target
+
+Where grub is stored
+
+On a bios system, the first 512 bytes on disk are the bootsector.
+
+446 bytes are for grub code, grub stage 1 loader
+
+64 bytes are for partition table --> only 4 partitions not more.
+
+2 bytes are for magic code, generic identifier
+
+the next 32 sectors contains core grub components, such as its core file and the modules it uses.
+
+use hexadecimal utilities like xxd or hexdump to investigate
+
+
+UEFI systems, the uefi system is on the efi system partition
+this vfat formatted partition is mounted on /boot/efi
+
+
+Grub2 Configuration
+
+grub2 uses grub.cfg configuration file for booting
+
+this file should not be edited directly.
+
+To appyl changes to grub2, write them to the input file in /etc/default/grub
+
+from there compile the changes to the target file.
+
+grub2-mkconfig -o /boot/grub2/grub.cfg
+
+
+Check on your distribution where does this target file resides
+
+
+Use grub passwords as well
+
+the grub boot password is a password that is required for booting the computer
+
+the grub edit password is required for editing the grub menu entries
+
+
+Grub Edit Passwrod
+
+On Redhat systems
+
+grub2-setpassword
+
+this will create the /boot/grub2/user.cfg file containing the username root and the hash of the encrypted password
+
+the password will be required for making changes to grub2 options
+
+
+To set the boot password on REDHAT, look for the boot loader specification file in /boot/loader/entries
+
+in this file, add the line 
+
+grub_users root
+
+save and close the file
+
+Make sure you have first set the edit password, using grub2-setpassword. Reboot- you will be prompted for the actual root user password 
+
+
+procedure is different for ubuntu systems.
+
+
+Initramfs
+
+The linux kernel is modular 
+
+To keep the kernel files small on installation, an initramfs ( AKA initrd) that contains all the essential kernel modules is generated
+
+The initramfs is also responsible for loading the root filesystem.
+
+As the last step initramfs loads the init process ( not yet systemd)
+
+dracut -f (Red Hat Family)
+update-initramfs -u (Ubuntu and related)
+
+
+To show contents of initrd
+lsinitrd
+
+lsinitrd | less
+
+initially it was initram drive, redhat has changed it to initramfs
+
+
+lsinitrd | grep ext4
+
+If there is no result then
+
+
+vim /etc/dracut/conf
+
+vim /etc/dracut.conf.d/ext4.conf
+
+add_drivers+=" ext4 "
+
+to apply this to initramfs
+
+dracut -f
+
+lsinitrd | grep ext4
+
+
+Service Managers
+
+The service manager takes care of loading everything after the kernel and intird have being loaded and the root filesystem has being mounted.
+
+consists of few stages 
+
+initializes remaining hardware devices 
+mounting filesystems
+starting services
+
+systemd is the most common services manager now a days, alternatives are upstart and init.
+
+
+Accessing Early boot shell
+
+systemd.unit=emergency.target is early troubleshooting mode
+systemd.unit=rescue.target  is before loading of the services
+
+passing either of the values to grub kernel startup parameters to enter systemd troubleshooting mode.
+
+use rd.break or init=/bin/bash as a grub kernel startup parameter to enter a troubleshooting environment before systemd starts . This is used in very early stages to diagnose the problem.
+
+Enable debug-shell.service and access through /dev/tty9 while booting
+
+
+
+Real time Scenario
+
+wipe the mbr
+
+dd if=/dev/zero of=/dev/sda bs=1 count=446
+
+to check the if the boot-record has being empty
+
+xxd -l 512 /dev/sda
+
+notice this will not wipe the partition information.
+
+
+vgdisplay -a y cs
+mount /dev/cs/root /mnt 
+
+we will check the /mnt/proc /mnt/dev /mnt/boot if it contains anything, if not then
+
+mount -o bind /proc /mnt/proc
+mount -o bind /dev /mnt/dev
+mount -o /dev/sda1 /mnt/boot
+
+cd /mnt
+chroot
+
+grub2-install /dev/sda 
+
+xxd -l 512 /dev/sda 
